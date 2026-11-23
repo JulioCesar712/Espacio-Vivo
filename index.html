@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EspacioVivo | Parques y comunidad</title>
+    <!-- Bootstrap 5 por CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
+    <!-- Tipografía pensada para leer fácil -->
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Nuestra hoja de estilos -->
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+    <!-- ICONOS SVG: se definen una vez y se usan con <use href="#i-nombre"> -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-juegos" viewBox="0 0 24 24"><path d="M4 21 8 3h8l4 18M9 15h6" /></symbol>
+        <symbol id="i-bancas" viewBox="0 0 24 24"><path d="M3 11h18M5 11v7M19 11v7M4 7h16v4" /></symbol>
+        <symbol id="i-luz" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c1 1 1 2 1 3h6c0-1 0-2 1-3a6 6 0 0 0-4-10z" /></symbol>
+        <symbol id="i-acceso" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2" /><path d="M12 8v6l4 6M12 14l-4 6M6 10h12" /></symbol>
+        <symbol id="i-caminos" viewBox="0 0 24 24"><path d="M9 21 11 3h2l2 18M12 6v2M12 11v2M12 16v2" /></symbol>
+        <symbol id="i-verde" viewBox="0 0 24 24"><path d="M12 21v-6M12 3 6 12h4l-3 4h10l-3-4h4z" /></symbol>
+        <symbol id="i-familia" viewBox="0 0 24 24"><circle cx="8" cy="6" r="2" /><circle cx="16" cy="6" r="2" /><path d="M4 20v-6a4 4 0 0 1 8 0v6M12 20v-6a4 4 0 0 1 8 0v6" /></symbol>
+        <symbol id="i-mayores" viewBox="0 0 24 24"><circle cx="10" cy="5" r="2" /><path d="M10 8v7M10 15l-2 6M10 15l2 6M10 10l5 1v10" /></symbol>
+        <symbol id="i-movilidad" viewBox="0 0 24 24"><circle cx="10" cy="4" r="2" /><path d="M10 7v6h5l3 5M8 10h5M7 14a5 5 0 1 0 7 6" /></symbol>
+        <symbol id="i-jovenes" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2" /><path d="M12 8v6M7 11l5-1 5 1M12 14l-3 7M12 14l3 7" /></symbol>
+        <symbol id="i-ninos" viewBox="0 0 24 24"><circle cx="12" cy="6" r="2.5" /><path d="M8 21v-7a4 4 0 0 1 8 0v7M12 14v7" /></symbol>
+        <symbol id="i-todos" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" /></symbol>
+        <symbol id="i-corazon" viewBox="0 0 24 24"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-3 4.5 4.5 0 0 1 8 3c0 6-8 11-8 11z" /></symbol>
+        <symbol id="i-mas" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z" /><circle cx="12" cy="10" r="2.5" /></symbol>
+        <symbol id="i-usuario" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10" /></symbol>
+    </svg>
+
+    <!-- BARRA DE NAVEGACIÓN -->
+    <nav class="navbar navbar-expand-lg navbar-espacio sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="./index.html">
+                <span class="logo"><svg class="icono"><use href="#i-verde" /></svg></span>
+                EspacioVivo
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+                aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="menuPrincipal">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="./index.html">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#propuestas">Propuestas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#actividades">Actividades</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#participacion">Mi participación</a></li>
+                </ul>
+                <!-- Botón de sesión: lo controla script.js -->
+                <button type="button" class="btn btn-outline-espacio d-flex align-items-center gap-2" onclick="manejarSesion()">
+                    <svg class="icono"><use href="#i-usuario" /></svg>
+                    <span id="etiquetaSesion">Iniciar sesión</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <!-- PARQUE Y BOTÓN PRINCIPAL -->
+        <section class="mb-4">
+            <div class="card tarjeta mb-3">
+                <div class="card-body">
+                    <label for="parque" class="form-label fw-bold">
+                        <svg class="icono"><use href="#i-pin" /></svg> Parque seleccionado
+                    </label>
+                    <select id="parque" class="form-select">
+                        <option>Parque Las Palmeras</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Para crear una propuesta se necesita iniciar sesión -->
+            <button type="button" class="btn btn-espacio btn-lg w-100" onclick="abrirCrear()">
+                <svg class="icono"><use href="#i-mas" /></svg> Crear propuesta
+            </button>
+            <p class="small text-center mt-2 mb-0">Para proponer necesitas una cuenta. Ver y apoyar no la requiere.</p>
+        </section>
+
+        <!-- PROPUESTAS NUEVAS -->
+        <section class="mb-4">
+            <h2 class="h5 fw-bold mb-3">Propuestas nuevas</h2>
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <a href="./detalle.html?id=2" class="card tarjeta tarjeta-mint h-100 text-decoration-none">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold">Rampa en el camino central</h3>
+                            <span class="etiqueta bg-white">Nueva</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-12 col-md-4">
+                    <a href="./detalle.html?id=3" class="card tarjeta tarjeta-mint h-100 text-decoration-none">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold">Luz en la cancha</h3>
+                            <span class="etiqueta bg-white">Nueva</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-12 col-md-4">
+                    <a href="./detalle.html?id=1" class="card tarjeta tarjeta-mint h-100 text-decoration-none">
+                        <div class="card-body">
+                            <h3 class="h6 fw-bold">Reparar los columpios</h3>
+                            <span class="etiqueta bg-white">Nueva</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- LISTA DE PROPUESTAS CON FILTROS -->
+        <section class="mb-5" id="propuestas">
+            <h2 class="h5 fw-bold mb-3">Propuestas de mejora</h2>
+
+            <!-- Filtro por categoría (botones con icono grande y texto) -->
+            <p class="fw-bold mb-2">Filtrar por categoría</p>
+            <div class="rejilla rejilla-6 mb-3">
+                <button type="button" class="btn btn-opcion filtro-cat" data-categoria="Juegos" aria-pressed="false" onclick="filtrarCategoria(this)"><svg class="icono icono-grande"><use href="#i-juegos" /></svg>Juegos</button>
+                <button type="button" class="btn btn-opcion filtro-cat" data-categoria="Bancas" aria-pressed="false" onclick="filtrarCategoria(this)"><svg class="icono icono-grande"><use href="#i-bancas" /></svg>Bancas</button>
+                <button type="button" class="btn btn-opcion filtro-cat" data-categoria="Luz" aria-pressed="false" onclick="filtrarCategoria(this)"><svg class="icono icono-grande"><use href="#i-luz" /></svg>Luz</button>
+                <button type="button" class="btn btn-opcion filtro-cat" data-categoria="Acceso" aria-pressed="false" onclick="filtrarCategoria(this)"><svg class="icono icono-grande"><use href="#i-acceso" /></svg>Acceso</button>
+                <button type="button" class="btn btn-opcion filtro-cat" data-categoria="Caminos" aria-pressed="false" onclick="filtrarCategoria(this)"><svg class="icono icono-grande"><use href="#i-caminos" /></svg>Caminos</button>
+                <button type="button" class="btn btn-opcion filtro-cat" data-categoria="Verde" aria-pressed="false" onclick="filtrarCategoria(this)"><svg class="icono icono-grande"><use href="#i-verde" /></svg>Verde</button>
+            </div>
+
+            <!-- Filtro por beneficiarios y orden -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-6">
+                    <label for="filtroQuien" class="form-label fw-bold">¿A quién beneficia?</label>
+                    <select id="filtroQuien" class="form-select" onchange="aplicarFiltros()">
+                        <option>Todos</option>
+                        <option>Familia</option>
+                        <option>Mayores</option>
+                        <option>Movilidad</option>
+                        <option>Jóvenes</option>
+                        <option>Niños</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="orden" class="form-label fw-bold">Ordenar por</label>
+                    <select id="orden" class="form-select" onchange="ordenarPropuestas()">
+                        <option value="recientes">Más recientes</option>
+                        <option value="apoyadas">Más apoyadas</option>
+                        <option value="visitas">Pocas visitas</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TARJETAS DE PROPUESTAS (data-* guardan los datos para filtrar y ordenar) -->
+            <div class="row g-4" id="listaPropuestas">
+                <!-- Propuesta 1 -->
+                <div class="col-12 col-md-6 col-lg-4 propuesta" data-id="1" data-categoria="Juegos" data-quien="Familia,Niños" data-dias="4" data-apoyos="24" data-visitas="30">
+                    <article class="card tarjeta h-100">
+                        <div class="card-body d-flex flex-column gap-2">
+                            <h3 class="h6 fw-bold">Reparar los columpios</h3>
+                            <span class="etiqueta"><svg class="icono"><use href="#i-juegos" /></svg> Juegos infantiles</span>
+                            <p class="small mb-0">Beneficia a: Familia, Niños</p>
+                            <p class="fw-bold mb-0"><svg class="icono"><use href="#i-corazon" /></svg> <span class="contador">24</span> apoyos</p>
+                            <div class="d-flex gap-2 mt-auto">
+                                <button type="button" class="btn btn-apoyar w-100" onclick="apoyar('1')">Apoyar</button>
+                                <a href="./detalle.html?id=1" class="btn btn-outline-espacio w-100">Ver detalle</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <!-- Propuesta 2 -->
+                <div class="col-12 col-md-6 col-lg-4 propuesta" data-id="2" data-categoria="Acceso" data-quien="Movilidad,Mayores" data-dias="1" data-apoyos="3" data-visitas="5">
+                    <article class="card tarjeta h-100">
+                        <div class="card-body d-flex flex-column gap-2">
+                            <h3 class="h6 fw-bold">Rampa en el camino central</h3>
+                            <span class="etiqueta"><svg class="icono"><use href="#i-acceso" /></svg> Accesibilidad</span>
+                            <p class="small mb-0">Beneficia a: Movilidad, Mayores</p>
+                            <p class="fw-bold mb-0"><svg class="icono"><use href="#i-corazon" /></svg> <span class="contador">3</span> apoyos</p>
+                            <div class="d-flex gap-2 mt-auto">
+                                <button type="button" class="btn btn-apoyar w-100" onclick="apoyar('2')">Apoyar</button>
+                                <a href="./detalle.html?id=2" class="btn btn-outline-espacio w-100">Ver detalle</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <!-- Propuesta 3 -->
+                <div class="col-12 col-md-6 col-lg-4 propuesta" data-id="3" data-categoria="Luz" data-quien="Jóvenes,Todos" data-dias="2" data-apoyos="11" data-visitas="14">
+                    <article class="card tarjeta h-100">
+                        <div class="card-body d-flex flex-column gap-2">
+                            <h3 class="h6 fw-bold">Luz en la cancha</h3>
+                            <span class="etiqueta"><svg class="icono"><use href="#i-luz" /></svg> Iluminación</span>
+                            <p class="small mb-0">Beneficia a: Jóvenes, Todos</p>
+                            <p class="fw-bold mb-0"><svg class="icono"><use href="#i-corazon" /></svg> <span class="contador">11</span> apoyos</p>
+                            <div class="d-flex gap-2 mt-auto">
+                                <button type="button" class="btn btn-apoyar w-100" onclick="apoyar('3')">Apoyar</button>
+                                <a href="./detalle.html?id=3" class="btn btn-outline-espacio w-100">Ver detalle</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <!-- Propuesta 4 -->
+                <div class="col-12 col-md-6 col-lg-4 propuesta" data-id="4" data-categoria="Bancas" data-quien="Mayores,Familia" data-dias="9" data-apoyos="17" data-visitas="22">
+                    <article class="card tarjeta h-100">
+                        <div class="card-body d-flex flex-column gap-2">
+                            <h3 class="h6 fw-bold">Cambiar las bancas rotas</h3>
+                            <span class="etiqueta"><svg class="icono"><use href="#i-bancas" /></svg> Bancas</span>
+                            <p class="small mb-0">Beneficia a: Mayores, Familia</p>
+                            <p class="fw-bold mb-0"><svg class="icono"><use href="#i-corazon" /></svg> <span class="contador">17</span> apoyos</p>
+                            <div class="d-flex gap-2 mt-auto">
+                                <button type="button" class="btn btn-apoyar w-100" onclick="apoyar('4')">Apoyar</button>
+                                <a href="./detalle.html?id=4" class="btn btn-outline-espacio w-100">Ver detalle</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <!-- Propuesta 5 -->
+                <div class="col-12 col-md-6 col-lg-4 propuesta" data-id="5" data-categoria="Verde" data-quien="Todos" data-dias="12" data-apoyos="8" data-visitas="9">
+                    <article class="card tarjeta h-100">
+                        <div class="card-body d-flex flex-column gap-2">
+                            <h3 class="h6 fw-bold">Podar árboles y cortar el pasto</h3>
+                            <span class="etiqueta"><svg class="icono"><use href="#i-verde" /></svg> Áreas verdes</span>
+                            <p class="small mb-0">Beneficia a: Todos</p>
+                            <p class="fw-bold mb-0"><svg class="icono"><use href="#i-corazon" /></svg> <span class="contador">8</span> apoyos</p>
+                            <div class="d-flex gap-2 mt-auto">
+                                <button type="button" class="btn btn-apoyar w-100" onclick="apoyar('5')">Apoyar</button>
+                                <a href="./detalle.html?id=5" class="btn btn-outline-espacio w-100">Ver detalle</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <!-- Mensaje cuando los filtros no encuentran nada -->
+            <div id="sinResultados" class="card tarjeta mt-3 d-none">
+                <div class="card-body"><b>No hay propuestas con estos filtros.</b> Quita un filtro o crea una propuesta.</div>
+            </div>
+        </section>
+
+        <!-- ACTIVIDADES COMUNITARIAS -->
+        <section class="mb-5" id="actividades">
+            <h2 class="h5 fw-bold mb-3">Actividades comunitarias</h2>
+            <div class="row g-4">
+                <div class="col-12 col-md-4 actividad" data-id="1" data-cupo="12">
+                    <article class="card tarjeta h-100">
+                        <div class="card-body d-flex flex-column gap-2">
+                            <p class="fecha mb-0">22 nov</p>
+                            <h3 class="h6 fw-bold">Jornada de limpieza del parque</h3>
+                            <p class="small mb-0">08:00 · Parque Las Palmeras</p>
+                            <p class="small mb-0">Recojo de basura y limpieza de caminos.</p>
+                            <span class="etiqueta">Cupos disponibles: <span class="cupo">12</span></span>
+                            <button type="button" class="btn btn-espacio w-100 mt-auto" onclick="inscribirse('1')">Inscribirme</button>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-12 col-md-4 actividad" data-id="2" data-cupo="8">
+                    <article class="card tarjeta h-100">
+                        <div class="card-body d-flex flex-column gap-2">
+                            <p class="fecha mb-0">30 nov</p>
+                            <h3 class="h6 fw-bold">Taller de cuidado de áreas verdes</h3>
+                            <p class="small mb-0">10:00 · Salón vecinal</p>
+                            <p class="small mb-0">Aprende a podar y regar las plantas del parque.</p>
+                            <span class="etiqueta">Cupos disponibles: <span class="cupo">8</span></span>
+                            <button type="button" class="btn btn-espacio w-100 mt-auto" onclick="inscribirse('2')">Inscribirme</button>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-12 col-md-4 actividad" data-id="3" data-cupo="15">
+                    <article class="card tarjeta h-100">
+                        <div class="card-body d-flex flex-column gap-2">
+                            <p class="fecha mb-0">06 dic</p>
+                            <h3 class="h6 fw-bold">Plantación comunitaria</h3>
+                            <p class="small mb-0">09:00 · Parque Las Palmeras</p>
+                            <p class="small mb-0">Plantamos árboles nuevos entre vecinos.</p>
+                            <span class="etiqueta">Cupos disponibles: <span class="cupo">15</span></span>
+                            <button type="button" class="btn btn-espacio w-100 mt-auto" onclick="inscribirse('3')">Inscribirme</button>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- MI PARTICIPACIÓN (solo con sesión iniciada) -->
+        <section class="mb-5" id="participacion">
+            <h2 class="h5 fw-bold mb-3">Mi participación</h2>
+            <div id="participacionAviso" class="card tarjeta">
+                <div class="card-body">
+                    <p>Inicia sesión para ver tus propuestas, tus apoyos y tus actividades.</p>
+                    <button type="button" class="btn btn-espacio" onclick="manejarSesion()">Iniciar sesión</button>
+                </div>
+            </div>
+            <div id="participacionContenido" class="d-none">
+                <p class="h5" id="saludo"></p>
+                <div class="card tarjeta tarjeta-mint mb-3">
+                    <div class="card-body">
+                        <p class="fw-bold mb-1"><svg class="icono"><use href="#i-corazon" /></svg> <span id="insignia"></span></p>
+                        <p class="small mb-0">La insignia se gana al publicar propuestas o colaborar en actividades, no por votos.</p>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-4"><div class="card tarjeta h-100"><div class="card-body"><h3 class="h6 fw-bold">Mis propuestas</h3><ul id="misPropuestas"></ul></div></div></div>
+                    <div class="col-12 col-md-4"><div class="card tarjeta h-100"><div class="card-body"><h3 class="h6 fw-bold">Propuestas que apoyé</h3><ul id="misApoyos"></ul></div></div></div>
+                    <div class="col-12 col-md-4"><div class="card tarjeta h-100"><div class="card-body"><h3 class="h6 fw-bold">Mis actividades</h3><ul id="misActividades"></ul></div></div></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center small pb-4">EspacioVivo · Santa Cruz de la Sierra</footer>
+
+    <!-- VENTANA: ACCESO (aparece al crear una propuesta o inscribirse) -->
+    <div class="modal fade" id="modalAcceso" tabindex="-1" aria-labelledby="tituloAcceso" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" novalidate onsubmit="iniciarSesion(event)">
+                <div class="modal-header">
+                    <h2 class="modal-title h5 fw-bold" id="tituloAcceso">Para proponer necesitas una cuenta</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body d-grid gap-3">
+                    <p class="etiqueta mb-0">Ver y apoyar propuestas no requiere registro.</p>
+                    <div>
+                        <label for="nombre" class="form-label fw-bold">Nombre (opcional)</label>
+                        <input type="text" id="nombre" name="nombre" class="form-control" autocomplete="name">
+                    </div>
+                    <div>
+                        <label for="correo" class="form-label fw-bold">Correo electrónico</label>
+                        <input type="email" id="correo" name="correo" class="form-control" required autocomplete="email">
+                        <div class="invalid-feedback">Escribe un correo válido.</div>
+                    </div>
+                    <div>
+                        <label for="clave" class="form-label fw-bold">Contraseña (mínimo 4 caracteres)</label>
+                        <input type="password" id="clave" name="clave" class="form-control" required minlength="4">
+                        <div class="invalid-feedback">La contraseña debe tener al menos 4 caracteres.</div>
+                    </div>
+                    <button type="submit" class="btn btn-espacio w-100">Ingresar o crear cuenta</button>
+                    <button type="button" class="btn btn-outline-espacio w-100" data-bs-dismiss="modal">Seguir viendo propuestas</button>
+                    <p class="small text-center mb-0">Demostración: los datos se guardan solo en este navegador.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- VENTANA: CREAR PROPUESTA -->
+    <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="tituloCrear" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            <form class="modal-content" id="formularioPropuesta" novalidate onsubmit="publicarPropuesta(event)">
+                <div class="modal-header">
+                    <h2 class="modal-title h5 fw-bold" id="tituloCrear">Crear propuesta</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body d-grid gap-3">
+                    <span class="etiqueta bg-white"><svg class="icono"><use href="#i-pin" /></svg> Parque Las Palmeras</span>
+                    <div>
+                        <label for="titulo" class="form-label fw-bold">Título de la propuesta</label>
+                        <input type="text" id="titulo" name="titulo" class="form-control" maxlength="80" required>
+                        <div class="form-text">Ejemplo: Reparar los columpios</div>
+                        <div class="invalid-feedback">Completa este campo.</div>
+                    </div>
+                    <!-- Categoría: se elige una (botones de opción con icono) -->
+                    <fieldset>
+                        <legend class="h6 fw-bold">Categoría de mejora (elige una)</legend>
+                        <div class="rejilla">
+                            <input type="radio" class="btn-check" name="categoria" id="cat-Juegos" value="Juegos" required>
+                            <label class="btn btn-opcion" for="cat-Juegos"><svg class="icono icono-grande"><use href="#i-juegos" /></svg>Juegos</label>
+                            <input type="radio" class="btn-check" name="categoria" id="cat-Bancas" value="Bancas">
+                            <label class="btn btn-opcion" for="cat-Bancas"><svg class="icono icono-grande"><use href="#i-bancas" /></svg>Bancas</label>
+                            <input type="radio" class="btn-check" name="categoria" id="cat-Luz" value="Luz">
+                            <label class="btn btn-opcion" for="cat-Luz"><svg class="icono icono-grande"><use href="#i-luz" /></svg>Luz</label>
+                            <input type="radio" class="btn-check" name="categoria" id="cat-Acceso" value="Acceso">
+                            <label class="btn btn-opcion" for="cat-Acceso"><svg class="icono icono-grande"><use href="#i-acceso" /></svg>Acceso</label>
+                            <input type="radio" class="btn-check" name="categoria" id="cat-Caminos" value="Caminos">
+                            <label class="btn btn-opcion" for="cat-Caminos"><svg class="icono icono-grande"><use href="#i-caminos" /></svg>Caminos</label>
+                            <input type="radio" class="btn-check" name="categoria" id="cat-Verde" value="Verde">
+                            <label class="btn btn-opcion" for="cat-Verde"><svg class="icono icono-grande"><use href="#i-verde" /></svg>Verde</label>
+                            <div class="invalid-feedback">Elige una categoría.</div>
+                        </div>
+                    </fieldset>
+                    <!-- ¿A quién beneficia? opcional, se pueden marcar varias -->
+                    <fieldset>
+                        <legend class="h6 fw-bold">¿A quién beneficia? (opcional, varias)</legend>
+                        <div class="rejilla">
+                            <input type="checkbox" class="btn-check" name="quien" id="q-Familia" value="Familia">
+                            <label class="btn btn-opcion" for="q-Familia"><svg class="icono icono-grande"><use href="#i-familia" /></svg>Familia</label>
+                            <input type="checkbox" class="btn-check" name="quien" id="q-Mayores" value="Mayores">
+                            <label class="btn btn-opcion" for="q-Mayores"><svg class="icono icono-grande"><use href="#i-mayores" /></svg>Mayores</label>
+                            <input type="checkbox" class="btn-check" name="quien" id="q-Movilidad" value="Movilidad">
+                            <label class="btn btn-opcion" for="q-Movilidad"><svg class="icono icono-grande"><use href="#i-movilidad" /></svg>Movilidad</label>
+                            <input type="checkbox" class="btn-check" name="quien" id="q-Jovenes" value="Jóvenes">
+                            <label class="btn btn-opcion" for="q-Jovenes"><svg class="icono icono-grande"><use href="#i-jovenes" /></svg>Jóvenes</label>
+                            <input type="checkbox" class="btn-check" name="quien" id="q-Ninos" value="Niños">
+                            <label class="btn btn-opcion" for="q-Ninos"><svg class="icono icono-grande"><use href="#i-ninos" /></svg>Niños</label>
+                            <input type="checkbox" class="btn-check" name="quien" id="q-Todos" value="Todos">
+                            <label class="btn btn-opcion" for="q-Todos"><svg class="icono icono-grande"><use href="#i-todos" /></svg>Todos</label>
+                        </div>
+                    </fieldset>
+                    <div>
+                        <label for="descripcion" class="form-label fw-bold">Descripción</label>
+                        <textarea id="descripcion" name="descripcion" class="form-control" rows="4" maxlength="350" required></textarea>
+                        <div class="invalid-feedback">Completa este campo.</div>
+                    </div>
+                    <div>
+                        <label for="motivo" class="form-label fw-bold">Motivo o justificación</label>
+                        <textarea id="motivo" name="motivo" class="form-control" rows="3" maxlength="250" required></textarea>
+                        <div class="form-text">¿Por qué es importante para los vecinos?</div>
+                        <div class="invalid-feedback">Completa este campo.</div>
+                    </div>
+                    <p class="small mb-0">Título, categoría, descripción y motivo son obligatorios.</p>
+                    <button type="submit" class="btn btn-espacio w-100">Publicar propuesta</button>
+                    <button type="button" class="btn btn-outline-espacio w-100" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- VENTANA: CONFIRMACIÓN -->
+    <div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-labelledby="tituloConfirmacion" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body d-grid gap-3 text-center">
+                    <span class="circulo-ok mx-auto"><svg class="icono icono-grande"><use href="#i-check" /></svg></span>
+                    <h2 class="h4 fw-bold" id="tituloConfirmacion">¡Tu propuesta se registró correctamente!</h2>
+                    <p class="mb-0">Tus vecinos ya pueden verla y apoyarla.</p>
+                    <div class="card tarjeta tarjeta-mint text-start"><div class="card-body">
+                        <p class="fw-bold mb-1" id="resumenTitulo"></p>
+                        <p class="mb-1">Categoría: <span id="resumenCategoria"></span></p>
+                        <p class="mb-1">Beneficia a: <span id="resumenQuien"></span></p>
+                        <p class="mb-0">Estado: Publicada</p>
+                    </div></div>
+                    <button type="button" class="btn btn-espacio w-100" data-bs-dismiss="modal">Ver otras propuestas</button>
+                    <a href="./index.html" class="btn btn-outline-espacio w-100">Volver al inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AVISO EMERGENTE (reemplaza al alert) -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="aviso" class="toast aviso" role="status" aria-live="polite" data-bs-delay="3500">
+            <div class="toast-body" id="textoAviso"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu"
+        crossorigin="anonymous"></script>
+    <script src="./js/script.js"></script>
+</body>
+
+</html>
