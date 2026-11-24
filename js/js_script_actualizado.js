@@ -5,7 +5,8 @@
 // ============================================================
 
 // ----- Datos generales -----
-const CLAVE = "espaciovivo_v3"; // nombre con el que se guarda en el navegador
+const CLAVE = "espaciovivo_v4";        // nombre con el que se guarda en el navegador
+const CODIGO_AUTORIDAD = "1234";       // código fácil para verificar autoridad
 
 // Nombres completos de las categorías
 const NOMBRES = {
@@ -17,7 +18,7 @@ const NOMBRES = {
     Verde: "Áreas verdes"
 };
 
-// Datos de las propuestas base (los usa detalle.html)
+// Datos de las propuestas base (los usa detalle.html y el menú Atendidas)
 const propuestas = {
     1: { titulo: "Reparar los columpios", categoria: "Juegos", quien: "Familia, Niños", descripcion: "Los columpios tienen cadenas rotas y son peligrosos para los niños.", motivo: "Muchas familias usan el parque cada tarde.", estado: "En revisión", apoyos: 24 },
     2: { titulo: "Rampa en el camino central", categoria: "Acceso", quien: "Movilidad, Mayores", descripcion: "El camino central tiene un desnivel sin rampa y obliga a rodear por la calle.", motivo: "Las personas en silla de ruedas no pueden cruzar el parque.", estado: "Publicada", apoyos: 3 },
@@ -27,7 +28,7 @@ const propuestas = {
 };
 
 // ----- Variables globales -----
-let datos = leerDatos();      // usuario, apoyos, inscripciones y propuestas creadas
+let datos = leerDatos();      // usuario, apoyos, inscripciones, propias y atendidas
 let accionPendiente = null;   // acción que se hace después de iniciar sesión
 let categoriaActiva = "";     // categoría elegida en los filtros
 let idActual = null;          // propuesta que se ve en detalle.html
@@ -38,9 +39,12 @@ let idActual = null;          // propuesta que se ve en detalle.html
 function leerDatos() {
     try {
         const guardado = JSON.parse(localStorage.getItem(CLAVE));
-        if (guardado) return guardado;
+        if (guardado) {
+            if (!guardado.atendidas) guardado.atendidas = [];
+            return guardado;
+        }
     } catch (e) { }
-    return { usuario: null, apoyadas: [], inscritas: [], propias: [] };
+    return { usuario: null, apoyadas: [], inscritas: [], propias: [], atendidas: [] };
 }
 
 function guardarDatos() {
@@ -52,6 +56,14 @@ function guardarDatos() {
 // Busca una propuesta base o una creada por el usuario
 function buscarPropuesta(id) {
     return propuestas[id] || datos.propias.find(p => String(p.id) === String(id));
+}
+
+function esAutoridad() {
+    return !!(datos.usuario && datos.usuario.rol === "autoridad");
+}
+
+function estaAtendida(id) {
+    return datos.atendidas.some(a => String(a.id) === String(id));
 }
 
 // Evita que el texto escrito por el usuario rompa el HTML
@@ -71,7 +83,7 @@ function mostrarAviso(texto) {
 
 function abrirModal(id) {
     const modal = document.getElementById(id);
-    if (!modal) {            // en detalle.html no existen las ventanas: volvemos al inicio
+    if (!modal) {
         location.href = "./index.html";
         return;
     }
@@ -84,11 +96,41 @@ function cerrarModal(id) {
 }
 
 // ============================================================
-// SESIÓN (solo se pide para crear propuesta e inscribirse)
+// SESIÓN Y REGISTRO DE AUTORIDAD
 // ============================================================
+function alternarCamposAutoridad() {
+    const rol = document.getElementById("rolUsuario").value;
+    const bloque = document.getElementById("camposAutoridad");
+    const esAut = rol === "autoridad";
+    bloque.classList.toggle("d-none", !esAut);
+
+    document.getElementById("cargoAutoridad").required = esAut;
+    document.getElementById("ciAutoridad").required = esAut;
+    document.getElementById("codigoAutoridad").required = esAut;
+}
+
 function actualizarSesion() {
     const etiqueta = document.getElementById("etiquetaSesion");
-    etiqueta.textContent = datos.usuario ? "Salir (" + datos.usuario.nombre + ")" : "Iniciar sesión";
+    if (datos.usuario) {
+        const prefijo = esAutoridad() ? "Autoridad: " : "";
+        etiqueta.textContent = "Salir (" + prefijo + datos.usuario.nombre + ")";
+    } else {
+        etiqueta.textContent = "Iniciar sesión";
+    }
+
+    // Banner y botones exclusivos de autoridad en index.html
+    const banner = document.getElementById("bannerAutoridad");
+    if (banner) {
+        banner.classList.toggle("d-none", !esAutoridad());
+        if (esAutoridad()) {
+            document.getElementById("infoAutoridadBanner").textContent =
+                datos.usuario.nombre + " (" + datos.usuario.cargo + " · CI: " + datos.usuario.ci + ")";
+        }
+    }
+
+    document.querySelectorAll(".btn-atender").forEach(function (btn) {
+        btn.classList.toggle("d-none", !esAutoridad());
+    });
 }
 
 // Botón de la barra: abre el acceso o cierra la sesión
@@ -98,6 +140,7 @@ function manejarSesion() {
         guardarDatos();
         actualizarSesion();
         mostrarParticipacion();
+        if (document.getElementById("tituloDetalle")) cargarDetalle();
         mostrarAviso("Cerraste sesión.");
         return;
     }
@@ -116,25 +159,131 @@ function pedirSesion(accion) {
 function iniciarSesion(event) {
     event.preventDefault();
     const f = event.target;
+    const rol = f.rolUsuario.value;
+    const inputCodigo = document.getElementById("codigoAutoridad");
+
+    // Validar código de autoridad si seleccionó rol Autoridad
+    if (rol === "autoridad") {
+        if (inputCodigo.value.trim() !== CODIGO_AUTORIDAD) {
+            inputCodigo.setCustomValidity("Código incorrecto");
+        } else {
+            inputCodigo.setCustomValidity("");
+        }
+    } else {
+        inputCodigo.setCustomValidity("");
+    }
+
     f.classList.add("was-validated");
-    if (!f.checkValidity()) return; // muestra los mensajes de error
+    if (!f.checkValidity()) return;
 
     const correo = f.correo.value.trim();
-    datos.usuario = { nombre: f.nombre.value.trim() || correo.split("@")[0], correo: correo };
+    const nombre = f.nombre.value.trim() || correo.split("@")[0];
+
+    if (rol === "autoridad") {
+        datos.usuario = {
+            rol: "autoridad",
+            nombre: nombre,
+            cargo: f.cargoAutoridad.value.trim(),
+            ci: f.ciAutoridad.value.trim(),
+            correo: correo
+        };
+    } else {
+        datos.usuario = {
+            rol: "vecino",
+            nombre: nombre,
+            correo: correo
+        };
+    }
+
     guardarDatos();
     f.reset();
+    alternarCamposAutoridad();
     f.classList.remove("was-validated");
     cerrarModal("modalAcceso");
     actualizarSesion();
     mostrarParticipacion();
-    mostrarAviso("Sesión iniciada.");
+    mostrarAviso(rol === "autoridad" ? "Sesión iniciada como Autoridad verificada." : "Sesión iniciada.");
 
-    // Continúa con lo que el usuario quería hacer
     if (accionPendiente) {
         const accion = accionPendiente;
         accionPendiente = null;
         accion();
     }
+}
+
+// ============================================================
+// MARCAR COMO ATENDIDA Y MOVER AL MENÚ DE ATENDIDAS
+// ============================================================
+function marcarComoAtendida(id) {
+    id = String(id);
+    if (!esAutoridad()) {
+        mostrarAviso("Solo una autoridad verificada puede atender propuestas.");
+        return;
+    }
+    if (estaAtendida(id)) {
+        mostrarAviso("Esta propuesta ya está en el menú de Atendidas.");
+        return;
+    }
+
+    const p = buscarPropuesta(id);
+    if (!p) return;
+
+    const fechaHoy = new Date().toLocaleDateString("es-BO");
+    datos.atendidas.unshift({
+        id: id,
+        autoridad: datos.usuario.nombre,
+        cargo: datos.usuario.cargo,
+        ci: datos.usuario.ci,
+        fecha: fechaHoy
+    });
+
+    // Actualizar estado si es propuesta propia
+    const propia = datos.propias.find(item => String(item.id) === id);
+    if (propia) propia.estado = "Atendida";
+
+    guardarDatos();
+    renderizarAtendidas();
+    aplicarFiltros();
+    mostrarParticipacion();
+    mostrarAviso("Propuesta marcada como atendida y movida al menú Atendidas.");
+}
+
+function renderizarAtendidas() {
+    const listaAtendidas = document.getElementById("listaAtendidas");
+    const sinAtendidas = document.getElementById("sinAtendidas");
+    const contadorBadge = document.getElementById("contadorAtendidas");
+
+    if (contadorBadge) contadorBadge.textContent = datos.atendidas.length;
+    if (!listaAtendidas) return;
+
+    listaAtendidas.innerHTML = "";
+    sinAtendidas.classList.toggle("d-none", datos.atendidas.length > 0);
+
+    datos.atendidas.forEach(function (registro) {
+        const p = buscarPropuesta(registro.id);
+        if (!p) return;
+
+        const apoyosTotales = Number(p.apoyos) + (datos.apoyadas.includes(String(registro.id)) ? 1 : 0);
+        const html = `
+        <div class="col-12 col-md-6 col-lg-4">
+            <article class="card tarjeta tarjeta-mint h-100">
+                <div class="card-body d-flex flex-column gap-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="etiqueta bg-white"><svg class="icono"><use href="#i-${p.categoria.toLowerCase()}" /></svg> ${NOMBRES[p.categoria]}</span>
+                        <span class="etiqueta bg-white"><svg class="icono"><use href="#i-check" /></svg> Atendida</span>
+                    </div>
+                    <h3 class="h6 fw-bold mb-0">${esc(p.titulo)}</h3>
+                    <p class="small mb-0">Beneficia a: ${esc(p.quien)}</p>
+                    <p class="small mb-0"><b>Atendida por:</b> ${esc(registro.autoridad)} (${esc(registro.cargo)}) · ${esc(registro.fecha)}</p>
+                    <p class="fw-bold mb-0"><svg class="icono"><use href="#i-corazon" /></svg> ${apoyosTotales} apoyos</p>
+                    <div class="mt-auto pt-2">
+                        <a href="./detalle.html?id=${registro.id}" class="btn btn-outline-espacio w-100">Ver detalle</a>
+                    </div>
+                </div>
+            </article>
+        </div>`;
+        listaAtendidas.insertAdjacentHTML("beforeend", html);
+    });
 }
 
 // ============================================================
@@ -149,6 +298,7 @@ function apoyar(id) {
     datos.apoyadas.push(id);
     guardarDatos();
     marcarApoyadas();
+    renderizarAtendidas();
     marcarApoyoDetalle();
     mostrarParticipacion();
     mostrarAviso("¡Gracias por apoyar esta propuesta!");
@@ -170,7 +320,7 @@ function marcarApoyadas() {
 // ============================================================
 function filtrarCategoria(boton) {
     const categoria = boton.dataset.categoria;
-    categoriaActiva = (categoriaActiva === categoria) ? "" : categoria; // clic otra vez = quitar filtro
+    categoriaActiva = (categoriaActiva === categoria) ? "" : categoria;
     document.querySelectorAll(".filtro-cat").forEach(function (b) {
         const activo = b.dataset.categoria === categoriaActiva;
         b.classList.toggle("activo", activo);
@@ -183,6 +333,11 @@ function aplicarFiltros() {
     const quien = document.getElementById("filtroQuien").value;
     let visibles = 0;
     document.querySelectorAll(".propuesta").forEach(function (tarjeta) {
+        // Si ya fue atendida, se oculta de pendientes porque pasó al menú de Atendidas
+        if (estaAtendida(tarjeta.dataset.id)) {
+            tarjeta.classList.add("d-none");
+            return;
+        }
         const okCategoria = !categoriaActiva || tarjeta.dataset.categoria === categoriaActiva;
         const beneficiarios = tarjeta.dataset.quien;
         const okQuien = quien === "Todos" || beneficiarios.includes(quien) || beneficiarios.includes("Todos");
@@ -200,9 +355,9 @@ function ordenarPropuestas() {
     const apoyos = t => Number(t.querySelector(".contador").textContent);
 
     tarjetas.sort(function (a, b) {
-        if (orden === "apoyadas") return apoyos(b) - apoyos(a);               // más apoyos primero
-        if (orden === "visitas") return a.dataset.visitas - b.dataset.visitas; // menos visitas primero
-        return a.dataset.dias - b.dataset.dias;                                // más recientes primero
+        if (orden === "apoyadas") return apoyos(b) - apoyos(a);
+        if (orden === "visitas") return a.dataset.visitas - b.dataset.visitas;
+        return a.dataset.dias - b.dataset.dias;
     });
     tarjetas.forEach(t => lista.appendChild(t));
 }
@@ -218,7 +373,7 @@ function publicarPropuesta(event) {
     event.preventDefault();
     const f = event.target;
     f.classList.add("was-validated");
-    if (!f.checkValidity()) {                         // faltan campos obligatorios
+    if (!f.checkValidity()) {
         const primero = f.querySelector(":invalid");
         if (primero) primero.focus();
         return;
@@ -237,10 +392,10 @@ function publicarPropuesta(event) {
     datos.propias.unshift(p);
     guardarDatos();
     agregarTarjeta(p);
+    actualizarSesion();
     aplicarFiltros();
     mostrarParticipacion();
 
-    // Datos de la ventana de confirmación
     document.getElementById("resumenTitulo").textContent = p.titulo;
     document.getElementById("resumenCategoria").textContent = NOMBRES[p.categoria];
     document.getElementById("resumenQuien").textContent = p.quien;
@@ -253,6 +408,7 @@ function publicarPropuesta(event) {
 
 // Agrega al inicio de la lista la tarjeta de una propuesta nueva
 function agregarTarjeta(p) {
+    const claseBtnAtender = esAutoridad() ? "" : "d-none";
     const html = `
     <div class="col-12 col-md-6 col-lg-4 propuesta" data-id="${p.id}" data-categoria="${p.categoria}" data-quien="${esc(p.quien)}" data-dias="0" data-apoyos="${p.apoyos}" data-visitas="0">
         <article class="card tarjeta h-100">
@@ -265,6 +421,9 @@ function agregarTarjeta(p) {
                     <button type="button" class="btn btn-apoyar w-100" onclick="apoyar('${p.id}')">Apoyar</button>
                     <a href="./detalle.html?id=${p.id}" class="btn btn-outline-espacio w-100">Ver detalle</a>
                 </div>
+                <button type="button" class="btn btn-espacio w-100 btn-atender ${claseBtnAtender}" onclick="marcarComoAtendida('${p.id}')">
+                    <svg class="icono"><use href="#i-check" /></svg> Marcar como atendida
+                </button>
             </div>
         </article>
     </div>`;
@@ -315,22 +474,24 @@ function llenarLista(id, items, vacio) {
 
 function mostrarParticipacion() {
     const aviso = document.getElementById("participacionAviso");
-    if (!aviso) return; // esta sección solo existe en index.html
+    if (!aviso) return;
     const hayUsuario = !!datos.usuario;
     aviso.classList.toggle("d-none", hayUsuario);
     document.getElementById("participacionContenido").classList.toggle("d-none", !hayUsuario);
     if (!hayUsuario) return;
 
-    document.getElementById("saludo").textContent = "Hola, " + datos.usuario.nombre;
-    llenarLista("misPropuestas", datos.propias.map(p => p.titulo + " (Estado: " + p.estado + ")"), "Todavía no has publicado propuestas.");
+    const sufijoRol = esAutoridad() ? " — Autoridad (" + datos.usuario.cargo + ")" : "";
+    document.getElementById("saludo").textContent = "Hola, " + datos.usuario.nombre + sufijoRol;
+    llenarLista("misPropuestas", datos.propias.map(p => p.titulo + " (Estado: " + (estaAtendida(p.id) ? "Atendida" : p.estado) + ")"), "Todavía no has publicado propuestas.");
     llenarLista("misApoyos", datos.apoyadas.map(buscarPropuesta).filter(Boolean).map(p => p.titulo), "Aún no has apoyado propuestas.");
     llenarLista("misActividades", datos.inscritas.map(function (id) {
         return document.querySelector('.actividad[data-id="' + id + '"] h3').textContent;
     }), "No te has inscrito en actividades.");
 
-    // Insignia por aportar (no por votos)
-    const colabora = datos.propias.length > 0 || datos.inscritas.length > 0;
-    document.getElementById("insignia").textContent = colabora ? "Vecino colaborador" : "Aún no tienes insignia";
+    const colabora = datos.propias.length > 0 || datos.inscritas.length > 0 || esAutoridad();
+    document.getElementById("insignia").textContent = esAutoridad()
+        ? "Autoridad verificada"
+        : (colabora ? "Vecino colaborador" : "Aún no tienes insignia");
 }
 
 // ============================================================
@@ -343,15 +504,35 @@ function cargarDetalle() {
         document.getElementById("tituloDetalle").textContent = "No encontramos esta propuesta.";
         return;
     }
+
+    const regAtendida = datos.atendidas.find(a => String(a.id) === String(idActual));
     document.title = p.titulo + " | EspacioVivo";
     document.getElementById("tituloDetalle").textContent = p.titulo;
     document.getElementById("detalleCategoria").textContent = NOMBRES[p.categoria];
-    document.getElementById("detalleEstado").textContent = p.estado;
+    document.getElementById("detalleEstado").textContent = regAtendida ? "Atendida" : p.estado;
     document.getElementById("detalleQuien").textContent = p.quien;
     document.getElementById("detalleDescripcion").textContent = p.descripcion;
     document.getElementById("detalleMotivo").textContent = p.motivo;
     document.getElementById("iconoDetalle").setAttribute("href", "#i-" + p.categoria.toLowerCase());
+
+    const bloqueAtendida = document.getElementById("bloqueAtendidaDetalle");
+    const btnAtenderDet = document.getElementById("botonAtenderDetalle");
+    if (regAtendida) {
+        bloqueAtendida.classList.remove("d-none");
+        document.getElementById("detalleAtendidaPor").textContent =
+            "Atendida por " + regAtendida.autoridad + " (" + regAtendida.cargo + " · CI: " + regAtendida.ci + ") el " + regAtendida.fecha + ".";
+        btnAtenderDet.classList.add("d-none");
+    } else {
+        bloqueAtendida.classList.add("d-none");
+        btnAtenderDet.classList.toggle("d-none", !esAutoridad());
+    }
+
     marcarApoyoDetalle();
+}
+
+function atenderDesdeDetalle() {
+    marcarComoAtendida(idActual);
+    cargarDetalle();
 }
 
 function apoyarDetalle() {
@@ -360,7 +541,7 @@ function apoyarDetalle() {
 
 function marcarApoyoDetalle() {
     const contador = document.getElementById("contadorDetalle");
-    if (!contador || !idActual) return; // solo existe en detalle.html
+    if (!contador || !idActual) return;
     const p = buscarPropuesta(idActual);
     const ya = datos.apoyadas.includes(String(idActual));
     contador.textContent = p.apoyos + (ya ? 1 : 0);
@@ -372,13 +553,16 @@ function marcarApoyoDetalle() {
 // ============================================================
 document.addEventListener("DOMContentLoaded", function () {
     actualizarSesion();
-    if (document.getElementById("listaPropuestas")) {          // index.html
+    if (document.getElementById("listaPropuestas")) {
         datos.propias.slice().reverse().forEach(agregarTarjeta);
+        actualizarSesion();
         marcarApoyadas();
         marcarInscritas();
+        renderizarAtendidas();
+        aplicarFiltros();
         mostrarParticipacion();
     }
-    if (document.getElementById("tituloDetalle")) {            // detalle.html
+    if (document.getElementById("tituloDetalle")) {
         cargarDetalle();
     }
 });
