@@ -1,0 +1,281 @@
+/* ===== PALETA DE COLORES DE ESPACIOVIVO =====
+   Fondo: #D6F6DD | Texto: #1E2A22 | Primario/bordes: #60695C
+   Acentos: #99F7AB y #ABDF75 | Barra superior/etiquetas: #C5D6D8 */
+
+/* ----- General ----- */
+body {
+    background-color: #D6F6DD;
+    color: #1E2A22;
+    font-family: "Atkinson Hyperlegible", Arial, sans-serif;
+    font-size: 1.0625rem;
+}
+
+a {
+    color: #1E2A22;
+}
+
+/* Contorno visible al navegar con teclado */
+a:focus-visible,
+button:focus-visible,
+.form-control:focus,
+.form-select:focus,
+.btn-check:focus-visible+.btn-opcion {
+    outline: 3px solid #1E2A22;
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+/* ----- Iconos SVG ----- */
+.icono {
+    width: 1.3em;
+    height: 1.3em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: -0.25em;
+}
+
+.icono-grande {
+    width: 32px;
+    height: 32px;
+}
+
+.icono-enorme {
+    width: 96px;
+    height: 96px;
+    display: block;
+}
+
+/* ----- Barra de navegación ----- */
+.navbar-espacio {
+    background-color: #C5D6D8;
+    border-bottom: 2px solid #60695C;
+}
+
+.navbar-espacio .navbar-brand,
+.navbar-espacio .nav-link {
+    color: #1E2A22;
+}
+
+.navbar-espacio .nav-link {
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+.navbar-espacio .nav-link.active {
+    background-color: #99F7AB;
+    color: #1E2A22;
+    border: 2px solid #60695C;
+}
+
+.logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background-color: #60695C;
+    color: #FFFFFF;
+    display: grid;
+    place-items: center;
+}
+
+/* ----- Botones ----- */
+.btn-espacio,
+.btn-outline-espacio,
+.btn-apoyar {
+    min-height: 48px;
+    border: 2px solid #60695C;
+    border-radius: 12px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-espacio {
+    background-color: #60695C;
+    color: #FFFFFF;
+}
+
+.btn-espacio:hover {
+    background-color: #4A5247;
+    color: #FFFFFF;
+}
+
+.btn-outline-espacio {
+    background-color: #FFFFFF;
+    color: #1E2A22;
+}
+
+.btn-outline-espacio:hover {
+    background-color: #C5D6D8;
+    color: #1E2A22;
+}
+
+.btn-apoyar {
+    background-color: #ABDF75;
+    color: #1E2A22;
+    border-color: #1E2A22;
+}
+
+.btn-apoyar:hover {
+    background-color: #99F7AB;
+    color: #1E2A22;
+}
+
+/* ----- Tarjetas y etiquetas ----- */
+.tarjeta {
+    background-color: #FFFFFF;
+    border: 2px solid #60695C;
+    border-radius: 14px;
+    color: #1E2A22;
+}
+
+.tarjeta-mint {
+    background-color: #99F7AB;
+}
+
+.etiqueta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #C5D6D8;
+    color: #1E2A22;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    align-self: flex-start;
+}
+
+.fecha {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+/* ----- Botones de opción con icono (filtros y formulario) ----- */
+.rejilla {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.rejilla .invalid-feedback {
+    grid-column: 1 / -1;
+}
+
+.btn-opcion {
+    min-height: 96px;
+    border: 2px solid #60695C;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    color: #1E2A22;
+    font-weight: bold;
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-opcion:hover {
+    background-color: #C5D6D8;
+    color: #1E2A22;
+}
+
+/* Opción elegida: fondo oscuro, texto blanco y una marca (no depende solo del color) */
+.btn-check:checked+.btn-opcion,
+.btn-opcion.activo {
+    background-color: #60695C;
+    color: #FFFFFF;
+    border-color: #60695C;
+}
+
+.btn-check:checked+.btn-opcion::after,
+.btn-opcion.activo::after {
+    content: "✓";
+}
+
+/* ----- Formularios ----- */
+.form-control,
+.form-select {
+    border: 2px solid #60695C;
+    min-height: 52px;
+    color: #1E2A22;
+}
+
+/* Errores: sin rojo, con borde grueso y mensaje en negrita */
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid {
+    border-color: #1E2A22;
+    border-width: 4px;
+    background-image: none;
+}
+
+.was-validated .form-control:valid {
+    border-color: #60695C;
+    background-image: none;
+}
+
+.invalid-feedback {
+    color: #1E2A22;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.form-text {
+    color: #1E2A22;
+}
+
+fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+/* ----- Ventanas emergentes y avisos ----- */
+.modal-content {
+    border: 2px solid #60695C;
+    border-radius: 14px;
+}
+
+.circulo-ok {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background-color: #60695C;
+    color: #FFFFFF;
+    display: grid;
+    place-items: center;
+}
+
+.circulo-ok .icono {
+    width: 56px;
+    height: 56px;
+}
+
+.aviso {
+    background-color: #1E2A22;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
+/* ----- Botones de la página de detalle ----- */
+.boton-reserva {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+/* ----- Pantallas medianas y grandes ----- */
+@media (min-width: 768px) {
+    .rejilla-6 {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}

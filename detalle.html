@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver detalle | EspacioVivo</title>
+    <!-- Bootstrap 5 por CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-yEPZ7jP9S0QKiUQ0m3jjsO4ProIW7wvR9gXkI7JOGa2XVsw53Yke2bsdkBbjmmiX" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+    <!-- ICONOS SVG usados en esta página -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-juegos" viewBox="0 0 24 24"><path d="M4 21 8 3h8l4 18M9 15h6" /></symbol>
+        <symbol id="i-bancas" viewBox="0 0 24 24"><path d="M3 11h18M5 11v7M19 11v7M4 7h16v4" /></symbol>
+        <symbol id="i-luz" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c1 1 1 2 1 3h6c0-1 0-2 1-3a6 6 0 0 0-4-10z" /></symbol>
+        <symbol id="i-acceso" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2" /><path d="M12 8v6l4 6M12 14l-4 6M6 10h12" /></symbol>
+        <symbol id="i-caminos" viewBox="0 0 24 24"><path d="M9 21 11 3h2l2 18M12 6v2M12 11v2M12 16v2" /></symbol>
+        <symbol id="i-verde" viewBox="0 0 24 24"><path d="M12 21v-6M12 3 6 12h4l-3 4h10l-3-4h4z" /></symbol>
+        <symbol id="i-corazon" viewBox="0 0 24 24"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-3 4.5 4.5 0 0 1 8 3c0 6-8 11-8 11z" /></symbol>
+        <symbol id="i-usuario" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10" /></symbol>
+    </svg>
+
+    <!-- BARRA DE NAVEGACIÓN (igual a la de index.html) -->
+    <nav class="navbar navbar-expand-lg navbar-espacio sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="./index.html">
+                <span class="logo"><svg class="icono"><use href="#i-verde" /></svg></span>
+                EspacioVivo
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+                aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="menuPrincipal">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="./index.html">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="./index.html#propuestas">Propuestas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./index.html#actividades">Actividades</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./index.html#participacion">Mi participación</a></li>
+                </ul>
+                <button type="button" class="btn btn-outline-espacio d-flex align-items-center gap-2" onclick="manejarSesion()">
+                    <svg class="icono"><use href="#i-usuario" /></svg>
+                    <span id="etiquetaSesion">Iniciar sesión</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <!-- TÍTULO DE LA SECCIÓN -->
+        <section class="mb-3">
+            <h1 class="h4 fw-bold">Ver detalle</h1>
+        </section>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="row g-4">
+            <!-- 1. ICONO Y DATOS RÁPIDOS -->
+            <div class="col-12 col-md-4">
+                <div class="card tarjeta tarjeta-mint text-center">
+                    <div class="card-body d-grid gap-2 justify-items-center">
+                        <svg class="icono icono-enorme mx-auto"><use id="iconoDetalle" href="#i-verde" /></svg>
+                        <span class="etiqueta bg-white mx-auto" id="detalleCategoria"></span>
+                        <span class="etiqueta bg-white mx-auto"><svg class="icono"><use href="#i-check" /></svg> Estado: <span id="detalleEstado"></span></span>
+                        <p class="fw-bold mb-0"><svg class="icono"><use href="#i-corazon" /></svg> <span id="contadorDetalle">0</span> apoyos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. INFORMACIÓN DE LA PROPUESTA -->
+            <div class="col-12 col-md-8">
+                <!-- Título -->
+                <div class="card tarjeta mb-4">
+                    <div class="card-body">
+                        <h2 class="h4 fw-bold mb-0" id="tituloDetalle">Cargando...</h2>
+                    </div>
+                </div>
+                <!-- Descripción, motivo y beneficiarios -->
+                <div class="card tarjeta">
+                    <div class="card-body">
+                        <p><b>Beneficia a:</b> <span id="detalleQuien"></span></p>
+                        <p><b>Descripción:</b> <span id="detalleDescripcion"></span></p>
+                        <p class="mb-0"><b>Motivo:</b> <span id="detalleMotivo"></span></p>
+                    </div>
+                </div>
+                <!-- BOTONES -->
+                <div class="boton-reserva">
+                    <!-- Volver a la lista de propuestas -->
+                    <a href="./index.html#propuestas" class="btn btn-outline-espacio">VOLVER A PROPUESTAS</a>
+                    <!-- Apoyar (no requiere iniciar sesión) -->
+                    <button type="button" class="btn btn-apoyar" id="botonApoyarDetalle" onclick="apoyarDetalle()">APOYAR ESTA PROPUESTA</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AVISO EMERGENTE -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="aviso" class="toast aviso" role="status" aria-live="polite" data-bs-delay="3500">
+            <div class="toast-body" id="textoAviso"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-WyOxWvTyr1QaMPfiPJSv76iReVthorl5uWlFtZPyK0IEB0hGzo9y5Bp9mYanr8Bu"
+        crossorigin="anonymous"></script>
+    <script src="./js/script.js"></script>
+</body>
+
+</html>
