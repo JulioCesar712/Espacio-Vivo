@@ -155,11 +155,20 @@ button:focus-visible,
     font-size: 1.3rem;
 }
 
+/* Propuesta atendida por la Autoridad: fondo verde y etiqueta con texto (no depende solo del color) */
+.tarjeta.atendida {
+    background-color: #99F7AB;
+}
+
 /* ----- Botones de opción con icono (filtros y formulario) ----- */
 .rejilla {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+}
+
+.rejilla-2 {
+    grid-template-columns: repeat(2, 1fr);
 }
 
 .rejilla .invalid-feedback {

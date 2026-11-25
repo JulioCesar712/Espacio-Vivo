@@ -6,6 +6,7 @@
 
 // ----- Datos generales -----
 const CLAVE = "espaciovivo_v3"; // nombre con el que se guarda en el navegador
+const CODIGO_AUTORIDAD = "AUT-2026"; // código SIMULADO de acreditación (demostración)
 
 // Nombres completos de las categorías
 const NOMBRES = {
@@ -31,6 +32,7 @@ let datos = leerDatos();      // usuario, apoyos, inscripciones y propuestas cre
 let accionPendiente = null;   // acción que se hace después de iniciar sesión
 let categoriaActiva = "";     // categoría elegida en los filtros
 let idActual = null;          // propuesta que se ve en detalle.html
+let idAtencion = null;        // propuesta que la Autoridad está atendiendo
 
 // ============================================================
 // GUARDAR Y LEER DATOS (localStorage)
@@ -38,9 +40,12 @@ let idActual = null;          // propuesta que se ve en detalle.html
 function leerDatos() {
     try {
         const guardado = JSON.parse(localStorage.getItem(CLAVE));
-        if (guardado) return guardado;
+        if (guardado) {
+            guardado.atenciones = guardado.atenciones || {};
+            return guardado;
+        }
     } catch (e) { }
-    return { usuario: null, apoyadas: [], inscritas: [], propias: [] };
+    return { usuario: null, apoyadas: [], inscritas: [], propias: [], atenciones: {} };
 }
 
 function guardarDatos() {
@@ -88,7 +93,8 @@ function cerrarModal(id) {
 // ============================================================
 function actualizarSesion() {
     const etiqueta = document.getElementById("etiquetaSesion");
-    etiqueta.textContent = datos.usuario ? "Salir (" + datos.usuario.nombre + ")" : "Iniciar sesión";
+    const rol = esAutoridad() ? " · Autoridad" : "";
+    etiqueta.textContent = datos.usuario ? "Salir (" + datos.usuario.nombre + rol + ")" : "Iniciar sesión";
 }
 
 // Botón de la barra: abre el acceso o cierra la sesión
@@ -98,6 +104,7 @@ function manejarSesion() {
         guardarDatos();
         actualizarSesion();
         mostrarParticipacion();
+        marcarEstados();
         mostrarAviso("Cerraste sesión.");
         return;
     }
@@ -116,17 +123,25 @@ function pedirSesion(accion) {
 function iniciarSesion(event) {
     event.preventDefault();
     const f = event.target;
+    // Si eligió Autoridad, el código de acreditación debe ser el correcto (simulación)
+    const rol = f.rol.value;
+    f.codigo.setCustomValidity(rol !== "autoridad" || f.codigo.value.trim() === CODIGO_AUTORIDAD ? "" : "Código inválido");
     f.classList.add("was-validated");
-    if (!f.checkValidity()) return; // muestra los mensajes de error
+    if (!f.checkValidity()) {          // muestra los mensajes de error
+        f.querySelector(":invalid").focus();
+        return;
+    }
 
     const correo = f.correo.value.trim();
-    datos.usuario = { nombre: f.nombre.value.trim() || correo.split("@")[0], correo: correo };
+    datos.usuario = { nombre: f.nombre.value.trim() || correo.split("@")[0], correo: correo, rol: rol };
     guardarDatos();
     f.reset();
+    cambiarRol();
     f.classList.remove("was-validated");
     cerrarModal("modalAcceso");
     actualizarSesion();
     mostrarParticipacion();
+    marcarEstados();
     mostrarAviso("Sesión iniciada.");
 
     // Continúa con lo que el usuario quería hacer
@@ -237,6 +252,7 @@ function publicarPropuesta(event) {
     datos.propias.unshift(p);
     guardarDatos();
     agregarTarjeta(p);
+    marcarEstados();
     aplicarFiltros();
     mostrarParticipacion();
 
@@ -334,6 +350,72 @@ function mostrarParticipacion() {
 }
 
 // ============================================================
+// ROL AUTORIDAD: ATENDER PROPUESTAS (simulación)
+// ============================================================
+function esAutoridad() {
+    return !!datos.usuario && datos.usuario.rol === "autoridad";
+}
+
+// Muestra u oculta el campo del código según el rol elegido en el acceso
+function cambiarRol() {
+    const esAut = document.getElementById("rol-autoridad").checked;
+    document.getElementById("campoCodigo").classList.toggle("d-none", !esAut);
+    document.getElementById("codigo").required = esAut;
+}
+
+// Pone en cada tarjeta la etiqueta "Atendida" o, si es Autoridad, el botón para atender
+function marcarEstados() {
+    document.querySelectorAll(".propuesta").forEach(function (tarjeta) {
+        const id = tarjeta.dataset.id;
+        let espacio = tarjeta.querySelector(".espacio-atencion");
+        if (!espacio) {
+            tarjeta.querySelector(".contador").parentElement.insertAdjacentHTML("afterend", '<div class="espacio-atencion"></div>');
+            espacio = tarjeta.querySelector(".espacio-atencion");
+        }
+        const atendida = datos.atenciones[id];
+        tarjeta.querySelector(".tarjeta").classList.toggle("atendida", !!atendida);
+        if (atendida) {
+            espacio.innerHTML = '<span class="etiqueta bg-white"><svg class="icono"><use href="#i-check" /></svg> Atendida</span>';
+        } else if (esAutoridad()) {
+            espacio.innerHTML = '<button type="button" class="btn btn-outline-espacio w-100" onclick="abrirAtencion(\'' + id + '\')">Marcar como atendida</button>';
+        } else {
+            espacio.innerHTML = "";
+        }
+    });
+}
+
+function abrirAtencion(id) {
+    if (!esAutoridad()) {
+        mostrarAviso("Solo la Autoridad verificada puede atender propuestas.");
+        return;
+    }
+    idAtencion = String(id);
+    document.getElementById("atencionTitulo").textContent = buscarPropuesta(id).titulo;
+    abrirModal("modalAtencion");
+}
+
+function guardarAtencion(event) {
+    event.preventDefault();
+    if (!esAutoridad()) {
+        mostrarAviso("Solo la Autoridad verificada puede atender propuestas.");
+        return;
+    }
+    const f = event.target;
+    f.classList.add("was-validated");
+    if (!f.checkValidity()) {            // la respuesta oficial es obligatoria
+        f.respuesta.focus();
+        return;
+    }
+    datos.atenciones[idAtencion] = { estado: "Atendida", respuesta: f.respuesta.value.trim(), autoridad: datos.usuario.nombre };
+    guardarDatos();
+    f.reset();
+    f.classList.remove("was-validated");
+    cerrarModal("modalAtencion");
+    marcarEstados();
+    mostrarAviso("Propuesta marcada como atendida.");
+}
+
+// ============================================================
 // PÁGINA DE DETALLE (detalle.html?id=1)
 // ============================================================
 function cargarDetalle() {
@@ -346,7 +428,14 @@ function cargarDetalle() {
     document.title = p.titulo + " | EspacioVivo";
     document.getElementById("tituloDetalle").textContent = p.titulo;
     document.getElementById("detalleCategoria").textContent = NOMBRES[p.categoria];
-    document.getElementById("detalleEstado").textContent = p.estado;
+    // Si la Autoridad atendió la propuesta, se muestra su estado y su respuesta oficial
+    const atencion = datos.atenciones[idActual];
+    document.getElementById("detalleEstado").textContent = atencion ? atencion.estado : p.estado;
+    if (atencion) {
+        document.getElementById("detalleRespuesta").textContent = atencion.respuesta;
+        document.getElementById("detalleAutoridad").textContent = atencion.autoridad;
+        document.getElementById("bloqueRespuesta").classList.remove("d-none");
+    }
     document.getElementById("detalleQuien").textContent = p.quien;
     document.getElementById("detalleDescripcion").textContent = p.descripcion;
     document.getElementById("detalleMotivo").textContent = p.motivo;
@@ -375,6 +464,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.getElementById("listaPropuestas")) {          // index.html
         datos.propias.slice().reverse().forEach(agregarTarjeta);
         marcarApoyadas();
+        marcarEstados();
         marcarInscritas();
         mostrarParticipacion();
     }

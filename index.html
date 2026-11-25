@@ -326,6 +326,22 @@
                         <input type="email" id="correo" name="correo" class="form-control" required autocomplete="email">
                         <div class="invalid-feedback">Escribe un correo válido.</div>
                     </div>
+                    <!-- Rol: Ciudadano o Autoridad (la Autoridad necesita código de acreditación) -->
+                    <fieldset>
+                        <legend class="h6 fw-bold">Ingresar como</legend>
+                        <div class="rejilla rejilla-2">
+                            <input type="radio" class="btn-check" name="rol" id="rol-ciudadano" value="ciudadano" checked onchange="cambiarRol()">
+                            <label class="btn btn-opcion" for="rol-ciudadano"><svg class="icono icono-grande"><use href="#i-usuario" /></svg>Ciudadano</label>
+                            <input type="radio" class="btn-check" name="rol" id="rol-autoridad" value="autoridad" onchange="cambiarRol()">
+                            <label class="btn btn-opcion" for="rol-autoridad"><svg class="icono icono-grande"><use href="#i-check" /></svg>Autoridad</label>
+                        </div>
+                    </fieldset>
+                    <div id="campoCodigo" class="d-none">
+                        <label for="codigo" class="form-label fw-bold">Código de acreditación</label>
+                        <input type="text" id="codigo" name="codigo" class="form-control" autocomplete="off">
+                        <div class="form-text">Demostración: el código simulado es AUT-2026.</div>
+                        <div class="invalid-feedback">Código inválido. Revisa tu código o ingresa como ciudadano.</div>
+                    </div>
                     <div>
                         <label for="clave" class="form-label fw-bold">Contraseña (mínimo 4 caracteres)</label>
                         <input type="password" id="clave" name="clave" class="form-control" required minlength="4">
@@ -429,6 +445,28 @@
                     <a href="./index.html" class="btn btn-outline-espacio w-100">Volver al inicio</a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- VENTANA: ATENDER PROPUESTA (solo Autoridad) -->
+    <div class="modal fade" id="modalAtencion" tabindex="-1" aria-labelledby="tituloAtencion" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" novalidate onsubmit="guardarAtencion(event)">
+                <div class="modal-header">
+                    <h2 class="modal-title h5 fw-bold" id="tituloAtencion">Atender propuesta</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body d-grid gap-3">
+                    <p class="fw-bold mb-0" id="atencionTitulo"></p>
+                    <div>
+                        <label for="respuesta" class="form-label fw-bold">Respuesta oficial</label>
+                        <textarea id="respuesta" name="respuesta" class="form-control" rows="4" maxlength="300" required></textarea>
+                        <div class="invalid-feedback">Escribe la respuesta oficial.</div>
+                    </div>
+                    <button type="submit" class="btn btn-espacio w-100">Guardar atención</button>
+                    <button type="button" class="btn btn-outline-espacio w-100" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
         </div>
     </div>
 
